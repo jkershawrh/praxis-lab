@@ -1,0 +1,78 @@
+version: 1
+project: praxis-ai-gateway
+method: CDD-TDD-EDD-BDD-CBT
+
+stages:
+  - id: stage_0_contracts
+    name: Contract-driven definition
+    red_when:
+      - Backend configuration leaks into a client.
+      - A documented API or configuration field has no schema or fixture.
+    green_when:
+      - Client, gateway, backend, and deployment boundaries are explicit.
+      - Neutral backend configuration is validated.
+    evidence:
+      - features/backend_portability.feature
+      - docs/decisions/0001-backend-neutral-contract.md
+
+  - id: stage_1_infrastructure
+    name: Deployment validation
+    red_when:
+      - Manifests do not render or violate namespace security constraints.
+      - Readiness, TLS, Secret, or resource configuration is missing.
+    green_when:
+      - Manifests render deterministically and pass policy checks.
+      - OpenShift reports the gateway ready only when it can serve traffic.
+    evidence:
+      - features/gateway_health.feature
+
+  - id: stage_2_unit
+    name: Component behavior
+    red_when:
+      - Configuration accepts a missing backend URL or model name.
+      - A client can construct a direct upstream request.
+      - Secret values appear in logs or error messages.
+    green_when:
+      - Invalid gateway configuration fails safely.
+      - All clients target only the configured Praxis route.
+      - Log sanitization tests pass.
+    evidence:
+      - features/credential_isolation.feature
+
+  - id: stage_3_integration
+    name: End-to-end behavior
+    red_when:
+      - Equivalent polyglot requests produce incompatible gateway behavior.
+      - Backend replacement requires a client code change.
+    green_when:
+      - Java, Python, and TypeScript pass the shared request contract.
+      - MaaS and OpenShift AI overlays satisfy the same backend contract.
+    evidence:
+      - features/backend_portability.feature
+
+  - id: stage_4_benchmarks
+    name: Evidence-based nonfunctional behavior
+    red_when:
+      - A quantified claim lacks a reproducible measurement.
+      - A performance threshold is copied from an unrelated environment.
+    green_when:
+      - Every quantified claim maps to a benchmark and environment record.
+      - Unverified claims remain explicitly marked unverified.
+    evidence:
+      - tests/benchmark_rubric.yaml
+      - tests/claim_registry.yaml
+
+  - id: stage_5_publication
+    name: Learning and publication quality
+    red_when:
+      - Content teaches MaaS as the target architecture.
+      - A module lacks business context, verification, or a competency outcome.
+      - Unsupported compliance or supportability claims appear.
+    green_when:
+      - Red Hat is the primary platform story and component provenance is accurate.
+      - Each capability has See, Learn, Do, red, green, and evidence elements.
+      - Track 1 is independently executable.
+    evidence:
+      - DESIGN.md
+      - tests/competency_rubric.yaml
+

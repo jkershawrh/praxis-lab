@@ -1,0 +1,53 @@
+openapi: 3.0.3
+info:
+  title: Praxis Track 1 Client Contract
+  version: 0.1.0
+  description: The backend-neutral subset exercised by all Track 1 clients.
+paths:
+  /v1/chat/completions:
+    post:
+      operationId: createChatCompletion
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChatRequest"
+      responses:
+        "200":
+          description: A response returned through Praxis.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChatResponse"
+components:
+  schemas:
+    ChatRequest:
+      type: object
+      required: [model, messages]
+      properties:
+        model:
+          type: string
+        messages:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            required: [role, content]
+            properties:
+              role:
+                type: string
+              content:
+                type: string
+    ChatResponse:
+      type: object
+      required: [model, choices]
+      properties:
+        model:
+          type: string
+        choices:
+          type: array
+          minItems: 1
+          items:
+            type: object
+

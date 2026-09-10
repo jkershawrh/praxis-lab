@@ -1,0 +1,42 @@
+version: 1
+scale:
+  0: absent_or_unsafe
+  1: explained
+  2: demonstrated_manually
+  3: automated_repeatable_and_explained
+
+release_rules:
+  minimum_total: 28
+  maximum_total: 36
+  no_zero_scores: true
+  required_score_3:
+    - reproducibility
+    - security_and_secrets
+    - automated_validation
+
+dimensions:
+  - id: reproducibility
+    competency: Deploy and remove the same configuration repeatedly without drift.
+  - id: red_hat_alignment
+    competency: Explain which responsibilities belong to Praxis and which belong to Red Hat OpenShift.
+  - id: praxis_correctness
+    competency: Configure only capabilities verified in the pinned Praxis release.
+  - id: security_and_secrets
+    competency: Keep upstream credentials out of client code, images, configuration, and logs.
+  - id: observability
+    competency: Correlate a client request with gateway and backend evidence.
+  - id: resilience
+    competency: Predict and verify timeout, rejection, and backend-failure behavior.
+  - id: polyglot_consistency
+    competency: Demonstrate the same gateway contract from Java, Python, and TypeScript.
+  - id: learner_clarity
+    competency: Explain the design and trade-offs before executing commands.
+  - id: automated_validation
+    competency: Produce expected red evidence before change and green evidence after change.
+  - id: cleanup_and_idempotency
+    competency: Restore the environment and safely rerun every track.
+  - id: accessibility
+    competency: Navigate and understand the content with accessible structure and alternatives.
+  - id: industry_relevance
+    competency: Apply controls to an industry scenario without claiming automatic compliance.
+

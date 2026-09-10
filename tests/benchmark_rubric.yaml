@@ -1,0 +1,17 @@
+version: 1
+environment_required_fields:
+  - openshift_version
+  - praxis_version
+  - praxis_image_digest
+  - backend_type
+  - backend_model
+  - client_language
+  - concurrency
+  - request_fixture
+
+benchmarks: []
+policy:
+  - Do not establish performance thresholds until a baseline is measured on the target environment.
+  - Record gateway overhead separately from backend inference latency.
+  - Do not compare MaaS and in-cluster model results without documenting topology and load differences.
+

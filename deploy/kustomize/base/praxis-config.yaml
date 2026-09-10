@@ -1,0 +1,48 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: praxis-ai-config
+  labels:
+    app.kubernetes.io/name: praxis-ai
+    app.kubernetes.io/part-of: praxis-ai-gateway-lab
+data:
+  praxis-ai.yaml: |
+    listeners:
+      - name: ai-gateway
+        address: "0.0.0.0:8080"
+        filter_chains:
+          - access-control
+          - model-routing
+          - upstream-credentials
+    filter_chains:
+      - name: access-control
+        filters:
+          - filter: ip_acl
+            allow:
+              - "10.0.0.0/8"
+              - "172.16.0.0/12"
+              - "192.168.0.0/16"
+              - "127.0.0.1/32"
+      - name: model-routing
+        filters:
+          - filter: router
+            routes:
+              - path_prefix: "/v1/"
+                cluster: model-backend
+          - filter: load_balancer
+            clusters:
+              - name: model-backend
+                endpoints:
+                  - "mock-backend:8000"
+      - name: upstream-credentials
+        filters:
+          - filter: credential_injection
+            clusters:
+              - name: model-backend
+                header: Authorization
+                env_var: MODEL_API_KEY
+                header_prefix: "Bearer "
+                strip_client_credential: true
+    insecure_options:
+      allow_private_endpoints: true
+

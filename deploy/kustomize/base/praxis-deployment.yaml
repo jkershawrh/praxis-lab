@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: praxis-ai
+  labels:
+    app.kubernetes.io/name: praxis-ai
+    app.kubernetes.io/part-of: praxis-ai-gateway-lab
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: praxis-ai
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: praxis-ai
+        app.kubernetes.io/part-of: praxis-ai-gateway-lab
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: praxis-ai
+          image: ghcr.io/praxis-proxy/ai@sha256:ef1f8e216f3428e15bc5953f5938562658edc9232ebfce5f946f05cddd34a0e6
+          imagePullPolicy: IfNotPresent
+          args: ["--config", "/etc/praxis/praxis-ai.yaml"]
+          env:
+            - name: MODEL_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: model-backend-credentials
+                  key: api-key
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          readinessProbe:
+            exec:
+              command: ["wget", "-qO-", "http://127.0.0.1:9901/healthy"]
+            initialDelaySeconds: 2
+            periodSeconds: 5
+          livenessProbe:
+            exec:
+              command: ["wget", "-qO-", "http://127.0.0.1:9901/healthy"]
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: "1"
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          volumeMounts:
+            - name: config
+              mountPath: /etc/praxis/praxis-ai.yaml
+              subPath: praxis-ai.yaml
+              readOnly: true
+      volumes:
+        - name: config
+          configMap:
+            name: praxis-ai-config
+

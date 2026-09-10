@@ -1,0 +1,42 @@
+$patch: delete
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: praxis-ai-config
+---
+$patch: delete
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mock-backend-code
+---
+$patch: delete
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mock-backend
+---
+$patch: delete
+apiVersion: v1
+kind: Service
+metadata:
+  name: mock-backend
+---
+$patch: delete
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: praxis-ai
+---
+$patch: delete
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: praxis-ai-allow-required-traffic
+---
+$patch: delete
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: mock-backend-allow-praxis
+

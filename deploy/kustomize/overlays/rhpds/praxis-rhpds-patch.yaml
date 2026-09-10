@@ -1,0 +1,10 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: praxis-ai
+spec:
+  template:
+    metadata:
+      annotations:
+        praxis-lab.redhat.com/backend-profile: rhpds
+

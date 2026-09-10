@@ -1,0 +1,35 @@
+name: Validate Praxis gateway
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  static:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -e '.[dev]'
+      - run: make test-all
+      - run: kubectl kustomize deploy/kustomize/base >/tmp/base.yaml
+      - run: kubectl kustomize deploy/kustomize/overlays/rhpds >/tmp/rhpds.yaml
+
+  praxis-amd64:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate pinned Praxis configuration
+        run: |
+          docker run --rm \
+            -e MODEL_API_KEY=validation-only \
+            -v "$PWD/config/praxis/track1-mock.yaml:/etc/praxis/praxis-ai.yaml:ro" \
+            ghcr.io/praxis-proxy/ai@sha256:ef1f8e216f3428e15bc5953f5938562658edc9232ebfce5f946f05cddd34a0e6 \
+            --validate --config /etc/praxis/praxis-ai.yaml
+

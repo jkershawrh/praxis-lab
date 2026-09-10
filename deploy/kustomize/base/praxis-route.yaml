@@ -1,0 +1,19 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: praxis-ai
+  labels:
+    app.kubernetes.io/name: praxis-ai
+    app.kubernetes.io/part-of: praxis-ai-gateway-lab
+  annotations:
+    haproxy.router.openshift.io/timeout: 60s
+spec:
+  to:
+    kind: Service
+    name: praxis-ai
+  port:
+    targetPort: http
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+
