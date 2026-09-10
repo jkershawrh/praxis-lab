@@ -22,7 +22,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: praxis-ui
-          image: ghcr.io/jkershawrh/praxis-ai-gateway-ui:0.1.0
+          image: ghcr.io/jkershawrh/praxis-ai-gateway-ui@sha256:4d199e1a35cf6fbb1d77492cc9f40a82528de7ac581011e326a08c713ec803f2
           imagePullPolicy: IfNotPresent
           env:
             - name: PRAXIS_BASE_URL

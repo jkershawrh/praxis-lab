@@ -28,6 +28,7 @@ def test_base_deploys_routable_ui_with_gateway_only_configuration():
     env = {item["name"]: item["value"] for item in container["env"]}
 
     assert env == {"PRAXIS_BASE_URL": "http://praxis-ai:8080", "PRAXIS_MODEL": "lab-model"}
+    assert container["image"].startswith("ghcr.io/jkershawrh/praxis-ai-gateway-ui@sha256:")
     assert service["spec"]["ports"][0]["port"] == 7860
     assert route["spec"]["to"]["name"] == "praxis-ui"
     assert route["spec"]["tls"]["insecureEdgeTerminationPolicy"] == "Redirect"
