@@ -15,7 +15,7 @@
 - Twelve unit tests pass across the mock backend, RHPDS renderer, and learner UI.
 - One Track 1 configuration integration test passes.
 - Five publication-readiness tests pass.
-- The base Kustomize overlay renders ten OpenShift/Kubernetes resources without an error.
+- The base Kustomize overlay renders the gateway, UBI learner UI, mock backend, routes, and required network controls without an error.
 - The RHPDS overlay renders four resources, removes the mock backend and public Route, and retains the Secret reference.
 - The RHPDS configuration renderer accepts supported HTTP(S) endpoint forms and rejects credentials, query strings, fragments, and unsupported paths in model URLs.
 - The Java client compiles with the local JDK.

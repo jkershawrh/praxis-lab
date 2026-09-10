@@ -7,3 +7,4 @@ resources:
   - praxis-route.yaml
   - network-policy.yaml
   - mock-backend.yaml
+  - praxis-ui.yaml

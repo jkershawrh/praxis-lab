@@ -1,0 +1,87 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: praxis-ui
+spec:
+  template:
+    spec:
+      serviceAccountName: praxis-ui
+      containers:
+        - name: praxis-ui
+        - name: oauth-proxy
+          image: quay.io/openshift/origin-oauth-proxy@sha256:fb3c6f4b12b9c340c438d94ef0c347891e0bb3994763e5c6ae38011c016f4878
+          args:
+            - --https-address=:8443
+            - --provider=openshift
+            - --openshift-service-account=praxis-ui
+            - --upstream=http://127.0.0.1:7860
+            - --tls-cert=/etc/tls/private/tls.crt
+            - --tls-key=/etc/tls/private/tls.key
+            - --cookie-secret-file=/etc/proxy/secrets/session_secret
+            - --email-domain=*
+          ports:
+            - name: oauth
+              containerPort: 8443
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              cpu: 100m
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            readOnlyRootFilesystem: true
+          volumeMounts:
+            - name: proxy-tls
+              mountPath: /etc/tls/private
+              readOnly: true
+            - name: proxy-cookie
+              mountPath: /etc/proxy/secrets
+              readOnly: true
+      volumes:
+        - name: proxy-tls
+          secret:
+            secretName: praxis-ui-tls
+        - name: proxy-cookie
+          secret:
+            secretName: praxis-ui-proxy-cookie
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: praxis-ui
+  annotations:
+    service.beta.openshift.io/serving-cert-secret-name: praxis-ui-tls
+spec:
+  ports:
+    - name: https
+      port: 443
+      targetPort: oauth
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: praxis-ui
+spec:
+  port:
+    targetPort: https
+  tls:
+    termination: reencrypt
+    insecureEdgeTerminationPolicy: Redirect
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: praxis-ui-allow-required-traffic
+spec:
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              network.openshift.io/policy-group: ingress
+      ports:
+        - protocol: TCP
+          port: 8443

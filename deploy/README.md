@@ -15,6 +15,8 @@ The OpenShift Route uses edge TLS. Praxis's admin health endpoint remains bound 
 
 The base Route is suitable for a controlled lab environment because the injected credential authorizes only the mock backend. Before connecting a real model, the deployment must add a trusted downstream authentication boundary. Praxis does not provide that boundary automatically.
 
+The learner UI has its own edge-TLS Route in the mock profile. The RHPDS overlay protects that Route with an OpenShift OAuth proxy sidecar, re-encrypt TLS, a service serving certificate, and a generated cookie secret.
+
 RHPDS MaaS provisioning will replace the mock backend through an overlay. MaaS endpoint and virtual-key mechanics remain provisioning concerns; learner clients continue to use only `PRAXIS_BASE_URL`.
 
 ## RHPDS model-access overlay

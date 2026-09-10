@@ -92,6 +92,16 @@ A production exposure requires a separately designed and tested downstream OAuth
 
 The UI makes an otherwise invisible gateway hop understandable and returns evidence for the exact request rather than a potentially unrelated “latest trace.” It never receives the upstream credential.
 
+On OpenShift, obtain its edge-TLS route after deployment:
+
+```bash
+oc get route praxis-ui -o jsonpath='https://{.spec.host}{"\n"}'
+```
+
+The mock profile exposes only the non-sensitive deterministic backend. The RHPDS profile changes the UI route to re-encrypt TLS and places an OpenShift OAuth proxy in front of Gradio; direct Praxis access remains namespace-authorized only.
+
+For local UI development:
+
 ```bash
 python3 -m pip install -e '.[ui]'
 export PRAXIS_BASE_URL=http://127.0.0.1:8080

@@ -1,0 +1,90 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: praxis-ui
+  labels:
+    app.kubernetes.io/name: praxis-ui
+    app.kubernetes.io/part-of: praxis-ai-gateway-lab
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: praxis-ui
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: praxis-ui
+        app.kubernetes.io/part-of: praxis-ai-gateway-lab
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: praxis-ui
+          image: ghcr.io/jkershawrh/praxis-ai-gateway-ui:0.1.0
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: PRAXIS_BASE_URL
+              value: http://praxis-ai:8080
+            - name: PRAXIS_MODEL
+              value: lab-model
+          ports:
+            - name: http
+              containerPort: 7860
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 1Gi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            readOnlyRootFilesystem: true
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: praxis-ui
+  labels:
+    app.kubernetes.io/name: praxis-ui
+    app.kubernetes.io/part-of: praxis-ai-gateway-lab
+spec:
+  selector:
+    app.kubernetes.io/name: praxis-ui
+  ports:
+    - name: http
+      port: 7860
+      targetPort: http
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: praxis-ui
+  labels:
+    app.kubernetes.io/name: praxis-ui
+    app.kubernetes.io/part-of: praxis-ai-gateway-lab
+spec:
+  to:
+    kind: Service
+    name: praxis-ui
+  port:
+    targetPort: http
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect

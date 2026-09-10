@@ -31,6 +31,8 @@ checks = [
     check("praxis rollout is available", "rollout", "status", "deployment/praxis-ai", "--timeout=5s"),
     check("model credential secret exists", "get", "secret/model-backend-credentials", "-o", "name"),
     check("praxis service exists", "get", "service/praxis-ai", "-o", "name"),
+    check("learner UI rollout is available", "rollout", "status", "deployment/praxis-ui", "--timeout=5s"),
+    check("learner UI route exists", "get", "route/praxis-ui", "-o", "name"),
     check("network isolation exists", "get", "networkpolicy/praxis-ai-default-deny", "-o", "name"),
 ]
 state = "green" if all(item["passed"] for item in checks) else "red"

@@ -11,3 +11,4 @@ oc create secret generic model-backend-credentials \
 oc apply -k deploy/kustomize/base
 oc rollout status deployment/mock-backend --timeout=180s
 oc rollout status deployment/praxis-ai --timeout=180s
+oc rollout status deployment/praxis-ui --timeout=180s

@@ -1,0 +1,13 @@
+FROM registry.access.redhat.com/ubi9/python-312:9.6
+
+WORKDIR /opt/app-root/src
+COPY --chown=1001:0 requirements-ui.txt ./requirements-ui.txt
+RUN pip install --no-cache-dir -r requirements-ui.txt
+COPY --chown=1001:0 ui.py ./ui.py
+
+ENV HOME=/tmp \
+    GRADIO_ANALYTICS_ENABLED=False \
+    GRADIO_TEMP_DIR=/tmp/gradio
+USER 1001
+EXPOSE 7860
+CMD ["python3", "ui.py"]

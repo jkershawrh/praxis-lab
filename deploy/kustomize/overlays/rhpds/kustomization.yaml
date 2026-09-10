@@ -3,6 +3,8 @@ kind: Kustomization
 resources:
   - ../../base
   - network-policy-rhpds.yaml
+  - ui-oauth-resources.yaml
 patches:
   - path: remove-lab-resources.yaml
   - path: praxis-rhpds-patch.yaml
+  - path: ui-oauth-patch.yaml
