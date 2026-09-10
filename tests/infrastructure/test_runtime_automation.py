@@ -21,3 +21,4 @@ def test_amd64_e2e_proves_gateway_owned_credential_replacement():
     assert "caller-supplied-wrong-secret" in runtime_test
     assert "gateway-owned-validation-secret" in runtime_test
     assert "Gateway logs exposed the upstream credential" in runtime_test
+    assert "Any HTTP response proves the listener is ready" in runtime_test

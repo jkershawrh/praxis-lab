@@ -28,7 +28,8 @@ response_file="$(mktemp /tmp/praxis-e2e-response.XXXXXX.json)"
 trap 'rm -f "$response_file"; cleanup' EXIT
 
 for attempt in $(seq 1 30); do
-  if curl --fail --silent "http://127.0.0.1:${gateway_port}/" >/dev/null; then
+  # Any HTTP response proves the listener is ready; Praxis does not promise a 2xx root route.
+  if curl --silent --output /dev/null "http://127.0.0.1:${gateway_port}/"; then
     break
   fi
   if [ "$attempt" -eq 30 ]; then
@@ -44,7 +45,13 @@ status="$(curl --silent --output "$response_file" --write-out '%{http_code}' \
   -H 'Authorization: Bearer caller-supplied-wrong-secret' \
   -d '{"model":"lab-model","messages":[{"role":"user","content":"hello"}]}')"
 
-test "$status" = "200"
+if [ "$status" != "200" ]; then
+  echo "Expected gateway status 200, received $status" >&2
+  cat "$response_file" >&2
+  docker logs "$gateway" >&2
+  docker logs "$mock" >&2
+  exit 1
+fi
 python3 - "$response_file" <<'PY'
 import json
 import sys
