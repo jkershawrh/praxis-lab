@@ -20,9 +20,14 @@
 - The RHPDS configuration renderer accepts supported HTTP(S) endpoint forms and rejects credentials, query strings, fragments, and unsupported paths in model URLs.
 - The Java client compiles with the local JDK.
 
+## Verified on AMD64 CI
+
+- GitHub Actions run `34479253005` completed successfully on `ubuntu-24.04` AMD64.
+- The pinned Praxis image executed its native `--validate` command successfully against `config/praxis/track1-mock.yaml`.
+- The static job installed the project tooling, passed all test stages, and rendered both Kustomize overlays.
+
 ## Pending OpenShift evidence
 
-- Praxis startup configuration validation with the pinned binary.
 - Restricted-v2 Security Context Constraints admission.
 - Readiness and liveness behavior.
 - Route TLS behavior.
