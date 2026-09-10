@@ -32,4 +32,5 @@ jobs:
             -v "$PWD/config/praxis/track1-mock.yaml:/etc/praxis/praxis-ai.yaml:ro" \
             ghcr.io/praxis-proxy/ai@sha256:ef1f8e216f3428e15bc5953f5938562658edc9232ebfce5f946f05cddd34a0e6 \
             --validate --config /etc/praxis/praxis-ai.yaml
-
+      - name: Run gateway-to-backend credential replacement test
+        run: ./tests/runtime/amd64-e2e.sh
