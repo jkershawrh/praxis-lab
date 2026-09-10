@@ -23,7 +23,7 @@ docker run -d --name "$mock" --network "$network" \
   -e EXPECTED_API_KEY="$gateway_secret" "$backend_image" >/dev/null
 mock_ip="$(docker inspect --format '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' "$mock")"
 sed "s/mock-backend/${mock_ip}/" config/praxis/track1-ci.yaml >"$runtime_config"
-docker run -d --name "$gateway" --network "$network" -p 127.0.0.1::8080 \
+docker run -d --name "$gateway" --network "$network" -p 127.0.0.1:0:8080 \
   -e MODEL_API_KEY="$gateway_secret" \
   -v "$runtime_config:/etc/praxis/praxis-ai.yaml:ro" \
   "$gateway_image" --config /etc/praxis/praxis-ai.yaml >/dev/null
