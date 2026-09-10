@@ -8,6 +8,7 @@ def test_required_foundation_artifacts_exist():
     required = [
         "DESIGN.md",
         "docs/capability-matrix.md",
+        "docs/ui-observability.md",
         "tests/validation_matrix.yaml",
         "tests/competency_rubric.yaml",
         "tests/claim_registry.yaml",
@@ -26,4 +27,3 @@ def test_every_feature_has_a_scenario():
         content = feature.read_text()
         assert "Feature:" in content, feature
         assert "Scenario" in content, feature
-

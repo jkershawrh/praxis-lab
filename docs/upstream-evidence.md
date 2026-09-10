@@ -26,6 +26,8 @@ The upstream demos provide concrete flows for:
 - A feature-gated policy-engine build integrating identity, policy decisions, redaction, audit, session taint, token exchange, and human approval.
 - Several Praxis Grid and MaaS integration environments.
 
+Maintainer feedback about the Grid demonstrations emphasized pairing networking behavior with a UI, topology, routing evidence, and tracing. The experimental cloud-burst material implements a particularly useful evidence rule: inject a unique W3C trace context for every UI request and query traces only by that exact ID. This presentation pattern is adopted independently of Grid.
+
 These demos are upstream evidence that a capability has been exercised. Each selected lab capability still needs a pinned configuration, an OpenShift test, and local red/green evidence in this repository.
 
 ## Core lab decisions
@@ -36,6 +38,7 @@ These demos are upstream evidence that a capability has been exercised. Each sel
 4. The MCP agentic loop belongs in an optional advanced module because it requires model tool-calling behavior and additional runtime services.
 5. The policy-engine demo is compelling for industry scenarios but requires a custom source build and unpublished feature dependencies. It must be labeled preview and cannot anchor the baseline Track 3 release.
 6. Grid, cloud bursting, distributed rate limiting, and Switchyard routing remain outside the core lab until promoted and qualified independently.
+7. A learner-facing topology and exact-request trace view is required for Track 2 even though Grid itself remains out of scope.
 
 ## MaaS interpretation
 
@@ -48,4 +51,3 @@ The organization exposes five open project areas: AI Grid, distributed inference
 ## Claim control
 
 Upstream demo performance observations are not copied into this project's claims. Any latency, throughput, token, capacity, or overhead claim must be measured again on the target Intel RHPDS environment and entered in `tests/claim_registry.yaml`.
-

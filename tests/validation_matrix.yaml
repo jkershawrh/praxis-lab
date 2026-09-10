@@ -72,7 +72,8 @@ stages:
       - Red Hat is the primary platform story and component provenance is accurate.
       - Each capability has See, Learn, Do, red, green, and evidence elements.
       - Track 1 is independently executable.
+      - Track 2 visualizes topology and retrieves trace evidence by the exact request trace ID.
+      - Missing traces are reported as unavailable rather than substituted with unrelated recent traces.
     evidence:
       - DESIGN.md
       - tests/competency_rubric.yaml
-

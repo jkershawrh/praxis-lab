@@ -74,7 +74,7 @@ Learners configure model allowlists, tenant separation, controlled egress, sensi
 | 5. Validate the boundary | 1 | Prove TLS, secret isolation, and backend portability |
 | 6. Route by policy | 2 | Apply model-aware routing centrally |
 | 7. Account and persist | 2 | Capture usage and response state intentionally |
-| 8. Observe requests | 2 | Correlate client, gateway, and backend evidence |
+| 8. Visualize and observe requests | 2 | Correlate the UI topology, routing result, and exact request trace |
 | 9. Reconcile with GitOps | 2 | Detect and correct configuration drift |
 | 10. Handle failure | 2 | Demonstrate defined timeout and recovery behavior |
 | 11. Isolate tenants | 3 | Prevent unauthorized cross-tenant access |
@@ -101,6 +101,10 @@ Every capability follows the same loop:
 The reference path prioritizes Red Hat OpenShift, Red Hat OpenShift AI model serving, OpenShift GitOps, OpenShift monitoring and logging capabilities, Red Hat build of Keycloak when identity federation is required, Red Hat Advanced Cluster Security when available, and Universal Base Image-derived application containers where practical.
 
 Components must be described accurately as Red Hat products, upstream projects, partner components, or lab infrastructure. Praxis is an upstream project deployed on OpenShift; this lab must not imply Red Hat product support for Praxis unless separately established.
+
+## Demonstration experience
+
+Track 1 includes a small request/response UI because terminal-only proxy demonstrations obscure the value of the gateway. Track 2 expands it into a topology and evidence view backed by exact-request tracing. The UI is a learning aid, not a replacement for OpenShift observability. Its contract is defined in `docs/ui-observability.md`.
 
 ## Release gates
 

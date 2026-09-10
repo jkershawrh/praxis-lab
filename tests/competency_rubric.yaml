@@ -24,7 +24,7 @@ dimensions:
   - id: security_and_secrets
     competency: Keep upstream credentials out of client code, images, configuration, and logs.
   - id: observability
-    competency: Correlate a client request with gateway and backend evidence.
+    competency: Correlate the learner UI, gateway decision, backend outcome, and exact request trace without exposing sensitive data.
   - id: resilience
     competency: Predict and verify timeout, rejection, and backend-failure behavior.
   - id: polyglot_consistency
@@ -39,4 +39,3 @@ dimensions:
     competency: Navigate and understand the content with accessible structure and alternatives.
   - id: industry_relevance
     competency: Apply controls to an industry scenario without claiming automatic compliance.
-
