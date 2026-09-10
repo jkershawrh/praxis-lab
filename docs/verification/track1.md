@@ -11,10 +11,10 @@
 ## Verified locally
 
 - Six contract tests pass.
-- Four infrastructure tests pass.
-- Three mock-backend unit tests pass.
+- Eight infrastructure tests pass.
+- Twelve unit tests pass across the mock backend, RHPDS renderer, and learner UI.
 - One Track 1 configuration integration test passes.
-- Two publication-foundation tests pass.
+- Five publication-readiness tests pass.
 - The base Kustomize overlay renders ten OpenShift/Kubernetes resources without an error.
 - The RHPDS overlay renders four resources, removes the mock backend and public Route, and retains the Secret reference.
 - The RHPDS configuration renderer accepts supported HTTP(S) endpoint forms and rejects credentials, query strings, fragments, and unsupported paths in model URLs.
@@ -24,19 +24,22 @@
 
 - GitHub Actions run `34479253005` completed successfully on `ubuntu-24.04` AMD64.
 - The pinned Praxis image executed its native `--validate` command successfully against `config/praxis/track1-mock.yaml`.
-- The static job installed the project tooling, passed all test stages, and rendered both Kustomize overlays.
+- GitHub Actions run `34482755952` completed successfully on `ubuntu-24.04` AMD64.
+- The runtime test sent a live request through Praxis to the UBI mock backend and received an OpenAI-compatible response.
+- The mock backend accepted only the gateway-owned credential even though the caller supplied a different authorization value.
+- The runtime test found no gateway-owned credential in Praxis logs.
+- The static job passed all 32 tests and rendered both Kustomize overlays.
 
 ## Pending OpenShift evidence
 
 - Restricted-v2 Security Context Constraints admission.
 - Readiness and liveness behavior.
 - Route TLS behavior.
-- Praxis-to-backend credential replacement.
 - End-to-end Java, Python, and TypeScript parity.
 - Fresh validate (red), solve, and final validate (green).
 - Confirmation that the Showroom service account has only the minimum port-forward permissions required by Track 1.
 
-The local host is ARM64 while the published Praxis `v0.3.0` image is AMD64-only. An attempted emulated image pull could not complete because the local Podman machine ran out of storage. This is an environment limitation, not positive runtime evidence; configuration remains `verified-local` only at the static-contract level until executed on an AMD64 environment.
+The local host is ARM64 while the published Praxis `v0.3.0` image is AMD64-only. An attempted emulated image pull could not complete because the local Podman machine ran out of storage. Native AMD64 behavior is therefore proven by the cited GitHub Actions run; OpenShift-specific behavior remains pending target-cluster execution.
 
 ## Security boundary
 

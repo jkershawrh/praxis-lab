@@ -9,6 +9,7 @@ def test_required_foundation_artifacts_exist():
         "DESIGN.md",
         "docs/capability-matrix.md",
         "docs/ui-observability.md",
+        "docs/decisions/0005-publication-shape.md",
         "tests/validation_matrix.yaml",
         "tests/competency_rubric.yaml",
         "tests/claim_registry.yaml",
