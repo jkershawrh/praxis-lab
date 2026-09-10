@@ -22,3 +22,4 @@ def test_amd64_e2e_proves_gateway_owned_credential_replacement():
     assert "gateway-owned-validation-secret" in runtime_test
     assert "Gateway logs exposed the upstream credential" in runtime_test
     assert "Any HTTP response proves the listener is ready" in runtime_test
+    assert "docker inspect --format" in runtime_test

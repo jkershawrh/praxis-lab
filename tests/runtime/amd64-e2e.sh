@@ -7,10 +7,13 @@ gateway="praxis-gateway-${GITHUB_RUN_ID:-local}-$$"
 backend_image="praxis-track1-mock:${GITHUB_SHA:-local}"
 gateway_image="ghcr.io/praxis-proxy/ai@sha256:ef1f8e216f3428e15bc5953f5938562658edc9232ebfce5f946f05cddd34a0e6"
 gateway_secret="gateway-owned-validation-secret"
+response_file="$(mktemp /tmp/praxis-e2e-response.XXXXXX.json)"
+runtime_config="$(mktemp /tmp/praxis-e2e-config.XXXXXX.yaml)"
 
 cleanup() {
   docker rm -f "$gateway" "$mock" >/dev/null 2>&1 || true
   docker network rm "$network" >/dev/null 2>&1 || true
+  rm -f "$response_file" "$runtime_config"
 }
 trap cleanup EXIT
 
@@ -18,14 +21,14 @@ docker build -t "$backend_image" -f backend/Containerfile backend
 docker network create "$network" >/dev/null
 docker run -d --name "$mock" --network "$network" \
   -e EXPECTED_API_KEY="$gateway_secret" "$backend_image" >/dev/null
+mock_ip="$(docker inspect --format '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' "$mock")"
+sed "s/mock-backend/${mock_ip}/" config/praxis/track1-ci.yaml >"$runtime_config"
 docker run -d --name "$gateway" --network "$network" -p 127.0.0.1::8080 \
   -e MODEL_API_KEY="$gateway_secret" \
-  -v "$PWD/config/praxis/track1-ci.yaml:/etc/praxis/praxis-ai.yaml:ro" \
+  -v "$runtime_config:/etc/praxis/praxis-ai.yaml:ro" \
   "$gateway_image" --config /etc/praxis/praxis-ai.yaml >/dev/null
 
 gateway_port="$(docker port "$gateway" 8080/tcp | sed 's/.*://')"
-response_file="$(mktemp /tmp/praxis-e2e-response.XXXXXX.json)"
-trap 'rm -f "$response_file"; cleanup' EXIT
 
 for attempt in $(seq 1 30); do
   # Any HTTP response proves the listener is ready; Praxis does not promise a 2xx root route.
