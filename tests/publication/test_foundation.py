@@ -39,3 +39,12 @@ def test_learner_evidence_bundle_is_sanitized_by_design():
     assert '"prompt content"' in collector
     assert "assessment.md" in collector
     assert ".tar.gz" in collector
+
+
+def test_learner_toolchain_bootstrap_is_version_pinned():
+    bootstrap = (ROOT / "tools/bootstrap_learner.sh").read_text()
+
+    assert "NODE_VERSION=" in bootstrap
+    assert "RIPGREP_VERSION=" in bootstrap
+    assert "latest" not in bootstrap
+    assert "python3 -m pip install --user -e '.[dev]'" in bootstrap

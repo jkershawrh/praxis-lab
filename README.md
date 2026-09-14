@@ -55,6 +55,14 @@ python3 -m pip install -e '.[dev]'
 make test-all
 ```
 
+The standard RHDP Showroom terminal can prepare the complete pinned learner
+toolchain without administrator access:
+
+```bash
+bash tools/bootstrap_learner.sh
+export PATH="$HOME/.local/bin:$PATH"
+```
+
 ## Deploy Track 1
 
 ### Deterministic mock path
