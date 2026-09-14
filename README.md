@@ -86,6 +86,23 @@ export PRAXIS_BASE_URL=http://127.0.0.1:8080
 python3 clients/python/client.py
 ```
 
+Run the same request contract from each language:
+
+```bash
+python3 clients/python/client.py
+mkdir -p /tmp/praxis-java
+javac -d /tmp/praxis-java clients/java/src/main/java/com/redhat/praxis/PraxisClient.java
+java -cp /tmp/praxis-java com.redhat.praxis.PraxisClient
+(cd clients/typescript && npm install && npm run invoke)
+```
+
+After completing the exercises, create a sanitized bundle that can be retained
+after the ephemeral OpenShift project is removed:
+
+```bash
+python3 tools/collect_evidence.py --project praxis-ai-gateway
+```
+
 A production exposure requires a separately designed and tested downstream OAuth/OIDC authentication boundary.
 
 ## Run the learner UI

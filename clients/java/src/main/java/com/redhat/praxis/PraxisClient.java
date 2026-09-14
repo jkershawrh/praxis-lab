@@ -29,6 +29,13 @@ public final class PraxisClient {
         return client.send(request, HttpResponse.BodyHandlers.ofString()).body();
     }
 
+    public static void main(String[] args) throws Exception {
+        String prompt = args.length == 0
+                ? "Explain the role of an AI gateway in one sentence."
+                : String.join(" ", args);
+        System.out.println(new PraxisClient().invoke(prompt));
+    }
+
     private static String requireEnvironment(String name) {
         String value = System.getenv(name);
         if (value == null || value.isBlank()) throw new IllegalStateException(name + " is required");
@@ -39,4 +46,3 @@ public final class PraxisClient {
         return value.replace("\\", "\\\\").replace("\"", "\\\"");
     }
 }
-

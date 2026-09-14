@@ -19,3 +19,13 @@ export async function invoke(prompt: string): Promise<ChatResponse> {
   return (await response.json()) as ChatResponse;
 }
 
+const isMain = process.argv[1]?.endsWith("client.ts");
+if (isMain) {
+  const prompt = process.argv.slice(2).join(" ") || "Explain the role of an AI gateway in one sentence.";
+  invoke(prompt)
+    .then((result) => console.log(JSON.stringify(result, null, 2)))
+    .catch((error: unknown) => {
+      console.error(error instanceof Error ? error.message : String(error));
+      process.exitCode = 1;
+    });
+}

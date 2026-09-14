@@ -28,3 +28,14 @@ def test_every_feature_has_a_scenario():
         content = feature.read_text()
         assert "Feature:" in content, feature
         assert "Scenario" in content, feature
+
+
+def test_learner_evidence_bundle_is_sanitized_by_design():
+    collector = (ROOT / "tools/collect_evidence.py").read_text()
+
+    assert "SAFE_RESOURCES" in collector
+    assert "secret/" not in collector.lower()
+    assert '"Secret values"' in collector
+    assert '"prompt content"' in collector
+    assert "assessment.md" in collector
+    assert ".tar.gz" in collector

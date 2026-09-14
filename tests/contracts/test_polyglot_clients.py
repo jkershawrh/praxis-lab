@@ -22,6 +22,13 @@ def test_all_clients_use_only_the_praxis_endpoint_contract():
         assert "litellm" not in source.lower(), language
 
 
+def test_all_clients_have_a_runnable_entry_point():
+    assert "if __name__ == \"__main__\"" in CLIENTS["python"].read_text()
+    assert "static void main" in CLIENTS["java"].read_text()
+    assert "isMain" in CLIENTS["typescript"].read_text()
+    assert (ROOT / "clients/typescript/package.json").is_file()
+
+
 def test_shared_openapi_contract_is_backend_neutral():
     contract = yaml.safe_load((ROOT / "contracts/openapi/praxis-client.yaml").read_text())
 
@@ -29,4 +36,3 @@ def test_shared_openapi_contract_is_backend_neutral():
     serialized = str(contract).lower()
     assert "maas" not in serialized
     assert "litellm" not in serialized
-
