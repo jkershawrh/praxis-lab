@@ -23,3 +23,13 @@ def test_amd64_e2e_proves_gateway_owned_credential_replacement():
     assert "Gateway logs exposed the upstream credential" in runtime_test
     assert "Any HTTP response proves the listener is ready" in runtime_test
     assert "docker inspect --format" in runtime_test
+
+
+def test_learner_config_validator_uses_pinned_nonroot_ephemeral_pod():
+    validator = (ROOT / "tools/validate_config_on_openshift.py").read_text()
+
+    assert "ghcr.io/praxis-proxy/ai@sha256:" in validator
+    assert '"--validate", "--config"' in validator
+    assert '"runAsNonRoot": True' in validator
+    assert '"allowPrivilegeEscalation": False' in validator
+    assert '"delete", "pod,configmap"' in validator
