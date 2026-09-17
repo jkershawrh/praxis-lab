@@ -166,7 +166,13 @@ oc delete project praxis-ai-gateway
 
 Track 3 includes a [contract-ready PPE → OCSF → immutable-ledger preview](docs/track3-ppe-ocsf-ledger-preview.md). It keeps PPE in charge of authorization and uses the exact Praxis trace ID to correlate a sanitized decision with a proof receipt. The module remains preview material until a pinned upstream audit interface passes its OpenShift conformance gates.
 
-Track 1 is the standalone quickstart candidate. Tracks 2 and 3 are the natural RHPDS lab expansion. See [DESIGN.md](DESIGN.md) and the [capability matrix](docs/capability-matrix.md) for the staged scope.
+Track 1 is the standalone technical quickstart candidate. The RHDP Showroom
+uses the same implementation as a solution-architect-led customer experience:
+the default 20–30 minute path demonstrates governed access and the application
+boundary, while operations and governance are optional discussion depths.
+Customers do not need access to this private engineering repository to complete
+the Showroom journey. See [DESIGN.md](DESIGN.md) and the
+[capability matrix](docs/capability-matrix.md) for the staged scope.
 
 ## Quality model
 

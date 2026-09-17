@@ -32,9 +32,14 @@ An OpenShift AI overlay must satisfy the same contract. Backend substitution is 
 
 ## Personas
 
-Primary persona: enterprise AI platform engineer.
+The private quickstart's primary persona is an enterprise AI platform engineer
+who needs implementation and validation depth.
 
-Secondary personas: application developer, security architect, AI governance lead, and operations engineer.
+The RHDP Showroom's primary delivery persona is a Red Hat solution architect
+facilitating a customer conversation with application, platform, security, and
+operations stakeholders. Its default path leads with the application outcome;
+terminal implementation depth is optional. The Showroom must not require
+participants to clone this private repository.
 
 Primary quickstart industry classification: Media and IT services. Track 3 applies the same platform pattern to Banking and securities, Healthcare provider, Government, Manufacturing, and Telecommunications without asserting regulatory compliance.
 
@@ -104,7 +109,14 @@ Components must be described accurately as Red Hat products, upstream projects, 
 
 ## Demonstration experience
 
-Track 1 includes a small request/response UI because terminal-only proxy demonstrations obscure the value of the gateway. Track 2 expands it into a topology and evidence view backed by exact-request tracing. The UI is a learning aid, not a replacement for OpenShift observability. Its contract is defined in `docs/ui-observability.md`.
+Track 1 includes a small request/response UI because terminal-only proxy
+demonstrations obscure the value of the gateway. In RHDP, this UI is the first
+customer interaction after orientation. The SA then proves the credential and
+exposure boundaries with a small number of namespace-scoped commands. Track 2
+adds exact-request correlation; it must not be described as full routing
+evidence or distributed tracing until those backends are deployed and tested.
+The UI is a learning aid, not a replacement for OpenShift observability. Its
+contract is defined in `docs/ui-observability.md`.
 
 ## Release gates
 
