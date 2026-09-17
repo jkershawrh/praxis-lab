@@ -60,6 +60,18 @@ these are absent:
 The red result is evidence that the integration has not yet been established,
 not an instruction to bypass policy or weaken audit delivery.
 
+From a sibling `are-immutable-ledger` checkout, exercise the version gate with
+the deliberately unsupported fixture:
+
+```bash
+cd ../are-immutable-ledger
+python3 adapters/praxis_ppe/ppe_to_ledger.py \
+  --file adapters/praxis_ppe/fixtures/ppe-audit-v2-invalid.jsonl
+```
+
+The command must reject `praxis.ppe.audit.v2` and exit nonzero before making a
+ledger call.
+
 ## Do: green phase
 
 After a pinned upstream audit interface is available:
@@ -78,6 +90,26 @@ Green evidence must include sanitized request metadata, policy outcome, OCSF
 mapping result, proof receipt, chain verification result, and delivery-mode
 result. It must not include credentials or model content.
 
+The reference adapter contract tests are the first green gate:
+
+```bash
+cd ../are-immutable-ledger
+python3 -m pytest -q tests/test_praxis_ppe_adapter.py
+```
+
+With the ledger running, replay the supported allow and deny fixtures:
+
+```bash
+python3 adapters/praxis_ppe/ppe_to_ledger.py \
+  --endpoint localhost:19292 \
+  --source-id praxis-lab-dev \
+  --file adapters/praxis_ppe/fixtures/ppe-audit-v1.jsonl
+```
+
+Fixture replay proves the adapter contract, not native Praxis emission. Replace
+the fixture only after the upstream readiness gate in the producer contract is
+satisfied.
+
 ## Assess
 
 The learner succeeds when they can:
@@ -95,4 +127,3 @@ Banking, healthcare, government, manufacturing, and telecommunications teams
 may choose different retention, delivery, identity, and redaction policies.
 Those profiles change the controls and evidence requirements; they do not
 turn this exercise into proof of regulatory compliance.
-
