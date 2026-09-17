@@ -164,6 +164,8 @@ oc delete project praxis-ai-gateway
 - **Track 2 — operate a platform capability:** add supported routing, accounting, persistence, correlated observability, failure behavior, and OpenShift GitOps reconciliation.
 - **Track 3 — apply governance patterns:** explore tenant isolation, allowlists, controlled egress, data handling, credential rotation, retention, and audit evidence for industry-sensitive scenarios without claiming regulatory compliance.
 
+Track 3 includes a [contract-ready PPE → OCSF → immutable-ledger preview](docs/track3-ppe-ocsf-ledger-preview.md). It keeps PPE in charge of authorization and uses the exact Praxis trace ID to correlate a sanitized decision with a proof receipt. The module remains preview material until a pinned upstream audit interface passes its OpenShift conformance gates.
+
 Track 1 is the standalone quickstart candidate. Tracks 2 and 3 are the natural RHPDS lab expansion. See [DESIGN.md](DESIGN.md) and the [capability matrix](docs/capability-matrix.md) for the staged scope.
 
 ## Quality model

@@ -60,7 +60,7 @@ Learners begin with stateless OpenAI Responses passthrough, then add supported p
 
 ### Track 3: Apply governance patterns
 
-Learners configure model allowlists, tenant separation, controlled egress, sensitive-data handling, request evidence, retention boundaries, credential rotation, and fail-open/fail-closed behavior. Scenario profiles explain industry motivations but do not claim that completion establishes compliance. The upstream policy-engine demonstration is treated as preview material because it requires a feature-gated source build and unpublished dependencies.
+Learners configure model allowlists, tenant separation, controlled egress, sensitive-data handling, request evidence, retention boundaries, credential rotation, and fail-open/fail-closed behavior. Scenario profiles explain industry motivations but do not claim that completion establishes compliance. The upstream policy-engine demonstration is treated as preview material because it requires a feature-gated source build and unpublished dependencies. The evidence-preservation preview maps a completed PPE decision to OCSF and an immutable-ledger receipt; PPE remains the authorization authority, the exact Praxis trace ID is the correlation key, and CPEX is not stacked beside PPE in the same request path.
 
 ## Module map
 
@@ -79,7 +79,7 @@ Learners configure model allowlists, tenant separation, controlled egress, sensi
 | 10. Handle failure | 2 | Demonstrate defined timeout and recovery behavior |
 | 11. Isolate tenants | 3 | Prevent unauthorized cross-tenant access |
 | 12. Apply data controls | 3 | Minimize or reject sensitive content by policy |
-| 13. Preserve audit evidence | 3 | Produce attributable request records without secrets |
+| 13. Preserve audit evidence | 3 | Correlate a sanitized PPE decision and proof receipt without treating evidence as authorization |
 | 14. Compare industry profiles | 3 | Explain policy trade-offs by scenario |
 | 15. Assess the platform | 3 | Demonstrate mastery against the rubric |
 

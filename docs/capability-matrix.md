@@ -19,6 +19,7 @@ This matrix is a design control. Each capability must be verified against the pi
 | Agentic MCP loop | Resolve and dispatch tools through a server-side loop | Provide runtime identity and network controls | Released and upstream demo | 3 optional | Version-gated loop tests |
 | Tenant/model policy | Enforce configured gateway rules | Isolate namespaces, identities, and networks | Feature-gated source-build demo | 3 preview | Positive and negative authorization tests |
 | Sensitive-data policy | Redact or reject fields through the policy path | Provide identity, policy, and audit dependencies | Feature-gated source-build demo | 3 preview | Redaction/rejection fixtures |
+| Tamper-evident policy evidence | Emit a stable completed PPE decision without request content | Run the OCSF adapter and ledger with identity, Secret, network, retention, and observability controls | Contract-ready preview; upstream audit interface pending | 3 preview | Exact-trace correlation, secret canary, idempotency, receipt, chain, and delivery-mode tests |
 | Grid/cloud-burst routing | Coordinate distributed providers | Provide multi-cluster networking and telemetry | Roadmap and experimental demos | Excluded from core lab | Separate experimental qualification |
 | Switchyard mixture-of-models | Route using an experimental external filter | Provide backend services | Experimental repository | Excluded from core lab | Separate experimental qualification |
 

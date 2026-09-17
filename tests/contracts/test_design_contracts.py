@@ -48,3 +48,33 @@ def test_rhpds_is_described_as_an_overlay_not_a_dependency():
 
     assert "deployment overlays implementing the same contract" in decision
     assert "not presented as" not in decision  # ADR states the decision directly, without lab prose.
+
+
+def test_track3_ledger_module_preserves_the_authorization_boundary():
+    module = (ROOT / "docs/track3-ppe-ocsf-ledger-preview.md").read_text()
+    normalized = " ".join(module.split())
+
+    assert "contract-ready preview" in module
+    assert "PPE remains responsible for authorization" in module
+    assert "exact same trace identifier" in module
+    assert '"latest event" fallback' in module
+    assert "does not prove the policy was correct" in normalized
+
+
+def test_track3_ledger_contract_namespaces_ppe_separately_from_cpex():
+    contract = (
+        ROOT.parent
+        / "are-immutable-ledger/contracts/praxis-ppe-ocsf-ledger-contract.md"
+    )
+
+    if not contract.exists():
+        # The lab can be cloned independently; its publication contract is
+        # still checked above. A sibling checkout enables cross-repo validation.
+        return
+
+    content = contract.read_text()
+    normalized = " ".join(content.lower().split())
+    assert "praxis.ppe.policy.<decision>.v1" in content
+    assert "contextforge deployment using cpex" in normalized
+    assert "must not inject" in content
+    assert "trace_id" in content
