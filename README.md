@@ -1,71 +1,132 @@
 # Govern AI Model Access with Praxis
 
-Give application teams one stable, governed interface for AI models while platform teams control backend endpoints, credentials, and routing. This test-first reference runs Praxis AI Gateway on Red Hat OpenShift and demonstrates the same request from Java, Python, and TypeScript.
+Praxis gives application teams one consistent way to call approved AI models while a platform team controls model endpoints, credentials, and routing. This reference implementation runs Praxis AI Gateway on Red Hat OpenShift and proves the same application contract from Java, Python, and TypeScript.
 
-> **Important:** RHPDS Model-as-a-Service (MaaS) supplies model access because shared demo environments need a practical model source. MaaS is not presented as a Praxis dependency or the recommended production model-serving architecture. Red Hat OpenShift AI or another compatible endpoint can satisfy the same backend-neutral contract.
+Use this repository to evaluate a customer pattern: applications integrate once with an internal AI gateway, and the organization can change the model service behind that gateway without rewriting every application.
 
 ## Contents
 
-- [What this demonstrates](#what-this-demonstrates)
+- [Customer problem](#customer-problem)
 - [Architecture](#architecture)
+- [How an application uses Praxis](#how-an-application-uses-praxis)
+- [How a platform team uses Praxis](#how-a-platform-team-uses-praxis)
+- [Customer adoption path](#customer-adoption-path)
 - [Requirements](#requirements)
 - [Deploy Track 1](#deploy-track-1)
 - [Run the learner UI](#run-the-learner-ui)
 - [Validate red and green](#validate-red-and-green)
 - [Learning tracks](#learning-tracks)
-- [Quality model](#quality-model)
+- [Production considerations](#production-considerations)
+- [Demo-platform profile](#demo-platform-profile)
 - [Project metadata](#project-metadata)
 
-## What this demonstrates
+## Customer problem
 
-Application teams commonly embed model URLs, provider credentials, and routing choices in each codebase. Track 1 moves those responsibilities behind Praxis, stores the upstream credential in an OpenShift Secret, and proves that polyglot clients depend only on the gateway contract.
+Without a gateway, each application may carry its own provider URL, model name, credential-handling logic, and routing assumptions. That creates duplicated integration work and makes a model change or credential rotation an application release event.
 
-Praxis is an upstream project demonstrated on OpenShift; this repository does not imply Red Hat product support for Praxis. The mock backend makes the first exercise deterministic and consumes no shared model quota. The RHPDS overlay then substitutes provisioned model access without changing learner clients.
+Praxis establishes a separation of responsibilities:
+
+- application teams call a stable OpenAI-compatible endpoint and a logical model name;
+- platform teams select approved model services and manage upstream credentials;
+- security and operations teams gain a common control and evidence point;
+- the model backend can change while the application-facing contract remains stable.
+
+This repository demonstrates that boundary. Praxis is an upstream project shown running on OpenShift; it is not represented here as a supported Red Hat product.
 
 ## Architecture
 
 ```mermaid
 flowchart LR
-    J[Java / Quarkus] --> P[Praxis AI Gateway]
-    Y[Python] --> P
-    T[TypeScript] --> P
-    P --> B[Configurable model backend]
-    B -. demo profile .-> M[RHPDS MaaS]
-    B -. enterprise profile .-> O[Red Hat OpenShift AI]
+    subgraph Apps[Customer applications]
+        J[Java / Quarkus]
+        Y[Python]
+        T[TypeScript]
+        A[Agents and services]
+    end
+
+    Apps -->|OpenAI-compatible request| G[Praxis AI Gateway]
+    G -->|Platform-managed route and credential| B[Approved model service]
+    B -. customer choice .-> O[Red Hat OpenShift AI]
+    B -. compatible service .-> C[Other approved endpoint]
+
+    P[OpenShift platform controls] --> G
+    P --> S[Secrets, network policy, observability, GitOps]
 ```
 
-Clients receive only `PRAXIS_BASE_URL`. Operators provide `MODEL_BASE_URL`, `PRAXIS_MODEL`, and `MODEL_API_KEY` to deployment automation. The credential is injected at the gateway and must never be exposed to clients, source control, UI evidence, or logs.
+The application knows the gateway URL and logical model. It does not need the upstream model URL or upstream credential. OpenShift supplies the deployment, secret, networking, and operational boundary around Praxis.
+
+## How an application uses Praxis
+
+An application receives:
+
+- `PRAXIS_BASE_URL`: the customer-managed gateway address;
+- `PRAXIS_MODEL`: the logical model name approved for that workload.
+
+It sends a normal chat-completions request:
+
+```bash
+curl --fail-with-body "${PRAXIS_BASE_URL}/v1/chat/completions" \
+  -H 'Content-Type: application/json' \
+  -d "{
+    \"model\": \"${PRAXIS_MODEL}\",
+    \"messages\": [
+      {\"role\": \"user\", \"content\": \"Explain governed AI access in one sentence.\"}
+    ]
+  }"
+```
+
+The repository includes equivalent examples for:
+
+- [Python](clients/python/client.py)
+- [Java](clients/java/src/main/java/com/redhat/praxis/PraxisClient.java)
+- [TypeScript](clients/typescript/src/client.ts)
+
+Those clients do not contain a model-provider URL or upstream API key. If the platform team changes the approved backend, the client contract remains `PRAXIS_BASE_URL` plus `PRAXIS_MODEL`.
+
+## How a platform team uses Praxis
+
+The platform team owns the backend-facing settings:
+
+- `MODEL_BASE_URL`: the approved OpenAI-compatible model endpoint;
+- `MODEL_API_KEY`: the upstream credential, stored in an OpenShift Secret;
+- `PRAXIS_MODEL`: the logical model presented to applications.
+
+Praxis routes requests to the approved backend and replaces any caller-supplied upstream authorization value with the gateway-owned credential. The credential must never be committed to source control, returned to clients, placed in UI evidence, or written to logs.
+
+The reference manifests also demonstrate an OpenShift namespace boundary, least-necessary network access, health checks, resource settings, and a non-sensitive proof UI. They are an evaluation baseline, not a complete production security design.
+
+## Customer adoption path
+
+1. **Select one application and one approved model service.** Start with a bounded workload whose expected request and response can be tested.
+2. **Deploy Praxis on OpenShift.** Keep the model endpoint and credential under platform-team control.
+3. **Change the application connection.** Point its OpenAI-compatible client at `PRAXIS_BASE_URL` and use a logical `PRAXIS_MODEL`.
+4. **Prove the boundary.** Verify successful inference, credential isolation, trace correlation, and failure behavior.
+5. **Add enterprise controls.** Integrate downstream identity, TLS, policy, rate limits, budgets, observability, GitOps, and lifecycle management according to the customer's requirements.
+6. **Onboard additional applications and models.** Reuse the gateway contract instead of recreating provider-specific integration in each codebase.
 
 ## Requirements
 
-The intended runtime is an x86_64/AMD64 OpenShift worker. The pinned Praxis `v0.3.0` image currently publishes an AMD64 manifest, so an Intel or AMD RHPDS cluster is the supported lab target.
+The evaluation target is Red Hat OpenShift on x86_64/AMD64 workers. The pinned Praxis `v0.3.0` image currently publishes an AMD64 manifest.
 
-Minimum lab environment:
+Minimum environment:
 
 - one OpenShift namespace with permission to create Deployments, Services, Routes, Secrets, ConfigMaps, and NetworkPolicies;
 - approximately 2 vCPU and 4 GiB available memory for Track 1;
-- `oc`, `python3`, `pip`, and `openssl` on the learner workstation;
+- `oc`, `python3`, `pip`, and `openssl` on the workstation;
 - outbound image-pull access to Red Hat's registry and GitHub Container Registry;
-- optional Java 17+ and Node.js 20+ for the additional clients.
+- optional Java 17+ and Node.js 20+ for the additional clients;
+- an approved OpenAI-compatible endpoint for a live-model evaluation.
 
-For local repository checks, install the development dependencies:
+For repository checks:
 
 ```bash
 python3 -m pip install -e '.[dev]'
 make test-all
 ```
 
-The standard RHDP Showroom terminal can prepare the complete pinned learner
-toolchain without administrator access:
-
-```bash
-bash tools/bootstrap_learner.sh
-export PATH="$HOME/.local/bin:$PATH"
-```
-
 ## Deploy Track 1
 
-### Deterministic mock path
+Track 1 is a repeatable technical evaluation, not a prescribed production installation. Its deterministic path uses a UBI-based mock model service so teams can first prove the gateway boundary without consuming model quota or sending data to an external model.
 
 ```bash
 oc new-project praxis-ai-gateway
@@ -73,28 +134,18 @@ oc new-project praxis-ai-gateway
 python3 runtime-automation/track1/validate.py
 ```
 
-The solver generates a lab-only secret, deploys the UBI-based mock backend and Praxis, and waits for both rollouts. The final validator emits machine-readable JSON with `"state": "green"` when the required controls exist.
+The solver creates a lab-only secret, deploys the mock service and Praxis, and waits for both rollouts. The validator returns machine-readable JSON with `"state": "green"` when the expected controls exist.
 
-### RHPDS model-access path
-
-RHPDS provisioning should pass values without displaying or committing them:
-
-```bash
-export MODEL_BASE_URL='<provided compatible endpoint>'
-export MODEL_API_KEY='<provided virtual key>'
-export PRAXIS_MODEL='<provided model name>'
-./deploy/rhpds/deploy.sh
-```
-
-This overlay removes the mock backend and public Route. An authenticated namespace user connects through OpenShift authorization:
+Connect an application through an authenticated namespace session:
 
 ```bash
 oc port-forward service/praxis-ai 8080:8080
 export PRAXIS_BASE_URL=http://127.0.0.1:8080
+export PRAXIS_MODEL=lab-model
 python3 clients/python/client.py
 ```
 
-Run the same request contract from each language:
+Run the same contract from all three example clients:
 
 ```bash
 python3 clients/python/client.py
@@ -104,40 +155,36 @@ java -cp /tmp/praxis-java com.redhat.praxis.PraxisClient
 (cd clients/typescript && npm install && npm run invoke)
 ```
 
-After completing the exercises, create a sanitized bundle that can be retained
-after the ephemeral OpenShift project is removed:
+To retain sanitized results after removing the OpenShift project:
 
 ```bash
 python3 tools/collect_evidence.py --project praxis-ai-gateway
 ```
 
-A production exposure requires a separately designed and tested downstream OAuth/OIDC authentication boundary.
-
 ## Run the learner UI
 
-The UI makes an otherwise invisible gateway hop understandable and returns evidence for the exact request rather than a potentially unrelated “latest trace.” It never receives the upstream credential.
+The optional UI is a demonstration and workshop aid. It makes the otherwise invisible gateway hop visible and correlates the response with the exact trace identifier, model, status, and elapsed time. It never receives the upstream credential.
 
-On OpenShift, obtain its edge-TLS route after deployment:
+After deployment, get its edge-TLS route:
 
 ```bash
 oc get route praxis-ui -o jsonpath='https://{.spec.host}{"\n"}'
 ```
-
-The mock profile exposes only the non-sensitive deterministic backend. The RHPDS profile changes the UI route to re-encrypt TLS and places an OpenShift OAuth proxy in front of Gradio; direct Praxis access remains namespace-authorized only.
 
 For local UI development:
 
 ```bash
 python3 -m pip install -e '.[ui]'
 export PRAXIS_BASE_URL=http://127.0.0.1:8080
+export PRAXIS_MODEL=lab-model
 python3 src/ui.py
 ```
 
-Open the printed local URL, submit a prompt, and compare the topology with the returned trace identifier, model, status, and elapsed time. Do not submit sensitive or regulated data to a shared demonstration model.
+Do not submit sensitive, confidential, or regulated data during an evaluation unless the selected model service and environment have been approved for it.
 
 ## Validate red and green
 
-The lab uses a competency-driven red/green loop:
+The repository uses a competency-driven red/green loop:
 
 ```bash
 # Before deployment: exits non-zero and reports state red.
@@ -150,9 +197,9 @@ python3 runtime-automation/track1/validate.py
 python3 runtime-automation/track1/validate.py
 ```
 
-CI also runs the pinned Praxis image natively on AMD64, sends a request through the gateway, proves that Praxis replaces a caller-supplied authorization value with the gateway-owned credential, and checks that the credential does not appear in gateway logs.
+CI also starts the pinned Praxis image on AMD64, sends a request through the gateway, proves that Praxis replaces caller-supplied authorization with the gateway-owned credential, and checks that the credential does not appear in gateway logs.
 
-To remove the mock exercise:
+Remove the evaluation environment with:
 
 ```bash
 oc delete project praxis-ai-gateway
@@ -160,19 +207,35 @@ oc delete project praxis-ai-gateway
 
 ## Learning tracks
 
-- **Track 1 — establish governed access (30–45 minutes):** deploy Praxis, connect one backend, invoke it from multiple languages, and prove credential isolation and backend portability.
+- **Track 1 — establish governed access (30–45 minutes):** connect an application through Praxis and prove backend portability and credential isolation.
 - **Track 2 — operate a platform capability:** add supported routing, accounting, persistence, correlated observability, failure behavior, and OpenShift GitOps reconciliation.
 - **Track 3 — apply governance patterns:** explore tenant isolation, allowlists, controlled egress, data handling, credential rotation, retention, and audit evidence for industry-sensitive scenarios without claiming regulatory compliance.
 
-Track 3 includes a [contract-ready PPE → OCSF → immutable-ledger preview](docs/track3-ppe-ocsf-ledger-preview.md). It keeps PPE in charge of authorization and uses the exact Praxis trace ID to correlate a sanitized decision with a proof receipt. The module remains preview material until a pinned upstream audit interface passes its OpenShift conformance gates.
+Track 3 includes a [contract-ready PPE → OCSF → immutable-ledger preview](docs/track3-ppe-ocsf-ledger-preview.md). PPE remains responsible for authorization; the pattern uses the Praxis trace ID to correlate a sanitized decision with a proof receipt. It remains preview material until a pinned upstream audit interface passes its OpenShift conformance gates.
 
-Track 1 is the standalone technical quickstart candidate. The RHDP Showroom
-uses the same implementation as a solution-architect-led customer experience:
-the default 20–30 minute path demonstrates governed access and the application
-boundary, while operations and governance are optional discussion depths.
-Customers do not need access to this private engineering repository to complete
-the Showroom journey. See [DESIGN.md](DESIGN.md) and the
-[capability matrix](docs/capability-matrix.md) for the staged scope.
+The staged scope is documented in [DESIGN.md](DESIGN.md) and the [capability matrix](docs/capability-matrix.md).
+
+## Production considerations
+
+Before production use, a customer architecture should explicitly address:
+
+- downstream OAuth/OIDC authentication and workload identity;
+- TLS and certificate lifecycle on both sides of the gateway;
+- tenancy, model allowlists, routing policy, quotas, budgets, and rate limits;
+- approved data classes, prompt and response handling, and retention;
+- audit, metrics, traces, alerts, and incident response;
+- secret rotation, configuration promotion, rollback, and disaster recovery;
+- image provenance, vulnerability management, support ownership, and Praxis version lifecycle.
+
+Red Hat OpenShift AI can provide the customer-owned model-serving path when it fits the architecture. Another compatible, approved model service can satisfy the same backend-neutral interface.
+
+## Demo-platform profile
+
+Red Hat Demo Platform environments use Model-as-a-Service to provide practical, shared access to models across multiple labs. MaaS is not presented as a Praxis dependency or the recommended production model-serving architecture.
+
+The demo overlay supplies `MODEL_BASE_URL`, `MODEL_API_KEY`, and `PRAXIS_MODEL` during provisioning, removes the deterministic mock, and protects the UI with OpenShift OAuth. Those mechanics exist for the hosted demonstration and are deliberately separated from the customer adoption pattern above.
+
+The Showroom experience is designed for a solution architect to guide a customer through the business problem, application contract, live proof, and optional operations or governance discussions. Customers do not need access to this engineering repository to participate.
 
 ## Quality model
 
@@ -190,7 +253,7 @@ Every capability links competency-based training (CBT), contract-driven developm
 
 - **Title:** Govern AI Model Access with Praxis
 - **Description:** Deploy a backend-neutral Praxis AI Gateway pattern on Red Hat OpenShift and verify it with polyglot clients.
-- **Industry:** Media and IT services; optional scenarios for banking, healthcare, government, manufacturing, and telecommunications
+- **Industry:** Cross-industry; optional scenarios for banking, healthcare, government, manufacturing, media, telecommunications, and IT services
 - **Product:** Red Hat OpenShift; Red Hat OpenShift AI integration path
 - **Use case:** Governed generative AI model access and platform engineering
 - **Partner:** Praxis upstream community
