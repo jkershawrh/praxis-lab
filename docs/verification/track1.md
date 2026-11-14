@@ -30,16 +30,24 @@
 - The runtime test found no gateway-owned credential in Praxis logs.
 - The static job passed all 32 tests and rendered both Kustomize overlays.
 
-## Pending OpenShift evidence
+## Verified on OpenShift
 
-- Restricted-v2 Security Context Constraints admission.
-- Readiness and liveness behavior.
-- Route TLS behavior.
-- End-to-end Java, Python, and TypeScript parity.
-- Fresh validate (red), solve, and final validate (green).
-- Confirmation that the Showroom service account has only the minimum port-forward permissions required by Track 1.
+The current test environment is Oberon, `https://api.oberon.fm2aihpcsed.com:6443`, project `praxis-ai-gateway`. Recorded 2026-10-12 with `./runtime-automation/track1/solve.sh` and the pinned `v0.3.0` image.
 
-The local host is ARM64 while the published Praxis `v0.3.0` image is AMD64-only. An attempted emulated image pull could not complete because the local Podman machine ran out of storage. Native AMD64 behavior is therefore proven by the cited GitHub Actions run; OpenShift-specific behavior remains pending target-cluster execution.
+- Before the project existed, `validate.py` returned `"state": "red"`.
+- After `solve.sh`, it returned `"state": "green"`.
+- The single worker, `oberon`, is AMD64. `mock-backend`, `praxis-ai`, and `praxis-ui` are Ready under `restricted-v2`.
+- A caller-supplied authorization header returned the mock assistant message. The gateway key was absent from Praxis logs.
+- Java, Python, and TypeScript clients each returned that same message through a port-forward.
+- The learner UI route returned HTTP 200 over HTTPS. Submitting the form through the UI API returned status 200, model `lab-model`, a trace id, and the mock assistant message in 27.9 ms.
+- Both routes terminate TLS at the edge and redirect insecure traffic.
+
+An earlier same-day run on `ocpv-infra01` in `intel-rh-demo` found two defects that are now fixed in the manifests: the lab config omitted the admin listener on `127.0.0.1:9901`, and DNS egress allowed port 53 but not the OpenShift DNS pod port 5353. Those lab objects were deleted. The pre-existing demo deployments on that cluster were not deleted. `ocpv-infra01` is not the test target.
+
+## Still open
+
+- Showroom service account port-forward permissions. Oberon has no Showroom, learner, or RHDP service account. The namespaces `rhdp-serviceaccounts` and `showroom-soundcheck-dev` are on `ocpv-infra01`, and this test no longer uses that cluster.
+- An ARM Praxis image. Tags `0.3.0` through `0.6.0` publish `linux/amd64` only. Oberon cannot run an ARM image.
 
 ## Security boundary
 
