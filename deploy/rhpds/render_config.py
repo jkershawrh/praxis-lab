@@ -30,6 +30,7 @@ def backend_from_url(value: str):
 def render(model_base_url: str):
     cluster, hostname = backend_from_url(model_base_url)
     config = {
+        "admin": {"address": "127.0.0.1:9901"},
         "listeners": [
             {
                 "name": "ai-gateway",

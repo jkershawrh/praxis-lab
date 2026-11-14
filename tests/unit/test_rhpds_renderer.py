@@ -32,6 +32,7 @@ def test_https_backend_sets_endpoint_sni_host_and_secret_reference():
     assert cluster["endpoints"] == ["models.example.com:443"]
     assert cluster["tls"] == {"sni": "models.example.com"}
     assert filters["headers"]["request_set"] == [{"name": "Host", "value": "models.example.com"}]
+    assert config["admin"]["address"] == "127.0.0.1:9901"
     assert credential["env_var"] == "MODEL_API_KEY"
     assert "value" not in credential
     assert "insecure_options" not in config

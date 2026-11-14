@@ -18,6 +18,7 @@ def test_praxis_routes_v1_to_mock_backend_and_injects_secret():
     cluster = filters["load_balancer"]["clusters"][0]
     credential = filters["credential_injection"]["clusters"][0]
 
+    assert config["admin"]["address"] == "127.0.0.1:9901"
     assert route == {"path_prefix": "/v1/", "cluster": "model-backend"}
     assert cluster["name"] == "model-backend"
     assert cluster["endpoints"] == ["mock-backend:8000"]

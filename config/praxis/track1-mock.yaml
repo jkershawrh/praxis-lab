@@ -1,5 +1,10 @@
 # Verified configuration surface: Praxis AI v0.3.0.
 # The mock backend is intentionally private and is replaced by an environment overlay.
+# The admin listener is the loopback health port the container probes. A full
+# config file replaces the built-in default, so this block has to be present.
+admin:
+  address: "127.0.0.1:9901"
+
 listeners:
   - name: ai-gateway
     address: "0.0.0.0:8080"

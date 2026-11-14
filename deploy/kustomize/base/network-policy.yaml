@@ -45,6 +45,17 @@ spec:
           port: 53
         - protocol: TCP
           port: 53
+    # OVN-Kubernetes evaluates DNS after the service DNAT, so the dns-default
+    # pods are reached on 5353 rather than the ClusterIP port 53.
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: openshift-dns
+      ports:
+        - protocol: UDP
+          port: 5353
+        - protocol: TCP
+          port: 5353
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
@@ -96,3 +107,12 @@ spec:
           port: 53
         - protocol: TCP
           port: 53
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: openshift-dns
+      ports:
+        - protocol: UDP
+          port: 5353
+        - protocol: TCP
+          port: 5353

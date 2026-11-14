@@ -1,3 +1,6 @@
+admin:
+  address: "127.0.0.1:9901"
+
 listeners:
   - name: ai-gateway
     address: "0.0.0.0:8080"

@@ -60,6 +60,7 @@ def test_upstream_credential_comes_from_secret_not_configmap():
     assert any(item.get("valueFrom", {}).get("secretKeyRef", {}).get("key") == "api-key" for item in env)
     assert "api-key" not in str(configmap).lower()
     assert "MODEL_API_KEY" in configmap["data"]["praxis-ai.yaml"]
+    assert 'address: "127.0.0.1:9901"' in configmap["data"]["praxis-ai.yaml"]
 
 
 def test_admin_health_port_is_not_exposed_by_service():
